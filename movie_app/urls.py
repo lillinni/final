@@ -8,4 +8,7 @@ urlpatterns = [
     path('movies/<int:id>/', views.movie_detail_api_view, name='movie-detail'),
     path('reviews/', views.review_list_api_view, name='review-list'),
     path('reviews/<int:id>/', views.review_detail_api_view, name='review-detail'),
+    
+    path('movies/reviews/', views.movie_with_reviews_api_view, name='movies-reviews'),
+    path('directors/movies-count/', views.directors_with_movies_count_api_view, name='directors-movies-count'),
 ]
