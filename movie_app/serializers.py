@@ -3,8 +3,8 @@ from .models import Director, Movie, Review
 from django.db.models import Avg, Count
 
 class DirectorSerializer(serializers.ModelSerializer):
-    movies_count = serializers.IntegerField(source='movies.count', read_only=True)  
-
+    movies_count = serializers.IntegerField(source='movies.count', read_only=True) 
+    
     class Meta:
         model = Director
         fields = '__all__'
