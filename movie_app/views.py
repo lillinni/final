@@ -20,6 +20,7 @@ def director_list_api_view(request):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['GET', 'PUT', 'DELETE'])
 def director_detail_api_view(request, id):
     director = get_object_or_404(Director, id=id)
@@ -54,6 +55,7 @@ def movie_list_api_view(request):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['GET', 'PUT', 'DELETE'])
 def movie_detail_api_view(request, id):
     movie = get_object_or_404(Movie, id=id)
@@ -87,6 +89,7 @@ def review_list_api_view(request):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['GET', 'PUT', 'DELETE'])
 def review_detail_api_view(request, id):
