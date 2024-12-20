@@ -1,4 +1,6 @@
+from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db import models
+import random
 
 class Director(models.Model):
     name = models.CharField(max_length=255)
@@ -22,3 +24,14 @@ class Review(models.Model):
     
     def __str__(self):
         return f'Review for {self.movie.title}'
+
+
+
+class CustomUser(AbstractUser):
+    is_confirmed = models.BooleanField(default=False)
+    confirmation_code = models.CharField(max_length=6, blank=True, null=True)
+
+    def generate_confirmation_code(self):
+        import random
+        self.confirmation_code = f"{random.randint(100000, 999999)}"
+        self.save()

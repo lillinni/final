@@ -1,10 +1,37 @@
-from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
+from . import serializers
+from .serializers import DirectorSerializer, MovieSerializer, ReviewSerializer, UserRegistrationSerializer, UserConfirmationSerializer
 from django.db.models import Avg, Count
 from .models import Director, Movie, Review
-from .serializers import DirectorSerializer, MovieSerializer, ReviewSerializer
+from django.shortcuts import get_object_or_404
+
+User = get_user_model()
+
+@api_view(['POST'])
+def user_registration(request):
+    if request.method == 'POST':
+        serializer = UserRegistrationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def user_confirmation(request):
+    if request.method == 'POST':
+        serializer = UserConfirmationSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            return Response({
+                'message': 'Пользователь подтвержден и активирован',
+                'username': user.username
+            }, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['GET', 'POST'])
 def director_list_api_view(request):
