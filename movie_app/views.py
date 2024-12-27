@@ -1,18 +1,23 @@
-from django.contrib.auth import get_user_model
+from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
 from rest_framework import status
-from . import serializers
-from .serializers import DirectorSerializer, MovieSerializer, ReviewSerializer, UserRegistrationSerializer, UserConfirmationSerializer
 from django.db.models import Avg, Count
-from .models import Director, Movie, Review
 from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
+from .models import Director, Movie, Review
+from .serializers import (
+    DirectorSerializer,
+    MovieSerializer,
+    ReviewSerializer,
+    UserRegistrationSerializer,
+    UserConfirmationSerializer,
+)
 
 User = get_user_model()
 
-@api_view(['POST'])
-def user_registration(request):
-    if request.method == 'POST':
+
+class UserRegistrationView(APIView):
+    def post(self, request, *args, **kwargs):
         serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -20,27 +25,28 @@ def user_registration(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['POST'])
-def user_confirmation(request):
-    if request.method == 'POST':
+class UserConfirmationView(APIView):
+    def post(self, request, *args, **kwargs):
         serializer = UserConfirmationSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
-            return Response({
-                'message': 'Пользователь подтвержден и активирован',
-                'username': user.username
-            }, status=status.HTTP_200_OK)
+            return Response(
+                {
+                    'message': 'Пользователь подтвержден и активирован',
+                    'username': user.username,
+                },
+                status=status.HTTP_200_OK,
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['GET', 'POST'])
-def director_list_api_view(request):
-    if request.method == 'GET':
+class DirectorListView(APIView):
+    def get(self, request, *args, **kwargs):
         directors = Director.objects.all()
         serializer = DirectorSerializer(directors, many=True)
-        return Response(data=serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    elif request.method == 'POST':
+    def post(self, request, *args, **kwargs):
         serializer = DirectorSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -48,34 +54,33 @@ def director_list_api_view(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['GET', 'PUT', 'DELETE'])
-def director_detail_api_view(request, id):
-    director = get_object_or_404(Director, id=id)
-    
-    if request.method == 'GET':
+class DirectorDetailView(APIView):
+    def get(self, request, pk, *args, **kwargs):
+        director = get_object_or_404(Director, pk=pk)
         serializer = DirectorSerializer(director)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
-    elif request.method == 'PUT':
+
+    def put(self, request, pk, *args, **kwargs):
+        director = get_object_or_404(Director, pk=pk)
         serializer = DirectorSerializer(director, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    elif request.method == 'DELETE':
+
+    def delete(self, request, pk, *args, **kwargs):
+        director = get_object_or_404(Director, pk=pk)
         director.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-@api_view(['GET', 'POST'])
-def movie_list_api_view(request):
-    if request.method == 'GET':
+class MovieListView(APIView):
+    def get(self, request, *args, **kwargs):
         movies = Movie.objects.all()
         serializer = MovieSerializer(movies, many=True)
-        return Response(data=serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    elif request.method == 'POST':
+    def post(self, request, *args, **kwargs):
         serializer = MovieSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -83,34 +88,33 @@ def movie_list_api_view(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['GET', 'PUT', 'DELETE'])
-def movie_detail_api_view(request, id):
-    movie = get_object_or_404(Movie, id=id)
-    
-    if request.method == 'GET':
+class MovieDetailView(APIView):
+    def get(self, request, pk, *args, **kwargs):
+        movie = get_object_or_404(Movie, pk=pk)
         serializer = MovieSerializer(movie)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
-    elif request.method == 'PUT':
+
+    def put(self, request, pk, *args, **kwargs):
+        movie = get_object_or_404(Movie, pk=pk)
         serializer = MovieSerializer(movie, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    elif request.method == 'DELETE':
+
+    def delete(self, request, pk, *args, **kwargs):
+        movie = get_object_or_404(Movie, pk=pk)
         movie.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-@api_view(['GET', 'POST'])
-def review_list_api_view(request):
-    if request.method == 'GET':
+class ReviewListView(APIView):
+    def get(self, request, *args, **kwargs):
         reviews = Review.objects.all()
         serializer = ReviewSerializer(reviews, many=True)
-        return Response(data=serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    elif request.method == 'POST':
+    def post(self, request, *args, **kwargs):
         serializer = ReviewSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -118,48 +122,50 @@ def review_list_api_view(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['GET', 'PUT', 'DELETE'])
-def review_detail_api_view(request, id):
-    review = get_object_or_404(Review, id=id)
-    
-    if request.method == 'GET':
+class ReviewDetailView(APIView):
+    def get(self, request, pk, *args, **kwargs):
+        review = get_object_or_404(Review, pk=pk)
         serializer = ReviewSerializer(review)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
-    elif request.method == 'PUT':
+
+    def put(self, request, pk, *args, **kwargs):
+        review = get_object_or_404(Review, pk=pk)
         serializer = ReviewSerializer(review, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    elif request.method == 'DELETE':
+
+    def delete(self, request, pk, *args, **kwargs):
+        review = get_object_or_404(Review, pk=pk)
         review.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-@api_view(['GET'])
-def movie_with_reviews_api_view(request):
-    movies = Movie.objects.annotate(average_rating=Avg('reviews__stars')) 
-    data = []
+class MovieWithReviewsView(APIView):
+    def get(self, request, *args, **kwargs):
+        movies = Movie.objects.annotate(average_rating=Avg('reviews__stars'))
+        data = []
+        for movie in movies:
+            reviews = movie.reviews.all()
+            review_serializer = ReviewSerializer(reviews, many=True)
+            data.append(
+                {
+                    'id': movie.id,
+                    'title': movie.title,
+                    'description': movie.description,
+                    'duration': movie.duration,
+                    'average_rating': round(movie.average_rating, 2)
+                    if movie.average_rating
+                    else 0,
+                    'reviews': review_serializer.data,
+                }
+            )
+        return Response(data, status=status.HTTP_200_OK)
 
-    for movie in movies:
-        reviews = movie.reviews.all()
-        review_serializer = ReviewSerializer(reviews, many=True)
-        data.append({
-            'id': movie.id,
-            'title': movie.title,
-            'description': movie.description,
-            'duration': movie.duration,
-            'average_rating': round(movie.average_rating, 2) if movie.average_rating else 0,
-            'reviews': review_serializer.data
-        })
 
-    return Response(data, status=status.HTTP_200_OK)
-
-
-@api_view(['GET'])
-def directors_with_movies_count_api_view(request):
-    directors = Director.objects.annotate(movies_count=Count('movies'))
-    serializer = DirectorSerializer(directors, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+class DirectorsWithMoviesCountView(APIView):
+    def get(self, request, *args, **kwargs):
+        directors = Director.objects.annotate(movies_count=Count('movies'))
+        serializer = DirectorSerializer(directors, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
