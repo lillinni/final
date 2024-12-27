@@ -11,3 +11,20 @@ __pycache__/
 # Anaconda
 .conda/
 .venv/
+# Virtual environment
+venv/
+env/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+
+# Database files
+db.sqlite3
+
+# Environment variables
+.env
+
+# Django static and media files
+/static/
+/media/
